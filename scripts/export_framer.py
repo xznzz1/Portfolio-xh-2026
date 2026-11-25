@@ -13,6 +13,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from remove_framer_badge import remove_from_html, remove_from_javascript
+from adapt_static_cms import adapt_javascript
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
@@ -141,7 +142,7 @@ def main():
             text = re.sub(r'EditorBar:s===void 0\?void 0:\(\(\)=>\{.*?\}\)\(\),adaptLayoutToTextDirection', 'EditorBar:void 0,adaptLayoutToTextDirection', text, flags=re.S)
         text = text.replace(source, target)
         if urllib.parse.urlsplit(url).path.endswith((".mjs", ".js")):
-            return remove_from_javascript(text)
+            return adapt_javascript(remove_from_javascript(text), {ref: asset_path(ref) for ref in assets}, base)
         return text
 
     for url, record in assets.items():
