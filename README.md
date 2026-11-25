@@ -2,13 +2,11 @@
 
 XH 摄影作品集，使用 GitHub Pages 部署。
 
-## 当前状态
+## 网站
 
-仓库和自动部署配置已准备。作品集的页面及素材尚未导入，网站尚未上线。
+[查看作品集](https://xznzz1.github.io/Portfolio-xh-2026/)
 
-原 Framer 编辑器项目需要登录，当前无法直接获取页面内容：
-
-[Outdoor Photographer — Template (copy)](https://framer.com/projects/Outdoor-Photographer-Template-copy--oh9uG2xqocOzAXBWjHkZ-71Opk)
+本仓库保存 [Framer 已发布作品集](https://successful-sandwich-977344.framer.app/) 的静态副本，包括首页、9 个作品详情页，以及页面所需的图片、字体、脚本和 CMS 索引。导航、资源路径和作品路由已适配 GitHub Pages 项目路径。
 
 ## 网站目录
 
@@ -20,9 +18,24 @@ GitHub Pages 的项目路径为 `/Portfolio-xh-2026/`。站内链接和资源路
 
 推送 `main` 分支中 `site/` 或部署工作流的更改时，GitHub Actions 会检查网站入口。入口存在且不为空时才发布 `site/`，否则跳过部署。也可在 Actions 中手动运行 **Deploy portfolio to GitHub Pages**。
 
-预留访问地址（尚未部署）：https://xznzz1.github.io/Portfolio-xh-2026/
-
 部署使用 [GitHub 官方 Pages Actions](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)。
+
+## 从 Framer 更新
+
+在 Framer 发布更改后，从本项目目录运行：
+
+```powershell
+$env:TEMP = 'D:\Projects\xh_photos_online\.tmp'
+$env:TMP = $env:TEMP
+python scripts/export_framer.py
+git add site docs/export-manifest.json
+git commit -m "Update portfolio from Framer"
+git push
+```
+
+`scripts/export_framer.py` 使用 Python 标准库下载已发布页面与静态资源，更新站内路径和 CMS 索引地址。资源下载缓存位于 `.cache/framer-source/`，导出清单位于 `docs/export-manifest.json`。
+
+GitHub 上的版本是发布时的副本。Framer 编辑器中的后续修改需要重新导出和推送后才会同步。Framer 的在线编辑和统计服务属于原托管平台，导出副本不连接这些服务。
 
 ## 本地存储
 
