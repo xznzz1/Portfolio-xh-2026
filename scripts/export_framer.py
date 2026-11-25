@@ -12,6 +12,7 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from remove_framer_badge import remove_from_html, remove_from_javascript
 
 ROOT = Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
@@ -138,7 +139,10 @@ def main():
             text = text.replace('path:`/work/', 'path:`' + base + 'work/')
             # The editor overlay operates on Framer hosting, outside the static site.
             text = re.sub(r'EditorBar:s===void 0\?void 0:\(\(\)=>\{.*?\}\)\(\),adaptLayoutToTextDirection', 'EditorBar:void 0,adaptLayoutToTextDirection', text, flags=re.S)
-        return text.replace(source, target)
+        text = text.replace(source, target)
+        if urllib.parse.urlsplit(url).path.endswith((".mjs", ".js")):
+            return remove_from_javascript(text)
+        return text
 
     for url, record in assets.items():
         destination = SITE / asset_path(url)
@@ -170,6 +174,7 @@ def main():
             return match.group(1) + html.escape(dest, quote=True) + match.group(3)
 
         text = re.sub(r'(\bhref\s*=\s*[\"\'])([^\"\']+)([\"\'])', href, text)
+        text = remove_from_html(text)
         route = urllib.parse.urlsplit(url).path.strip("/")
         destination = SITE / route / "index.html"
         destination.parent.mkdir(parents=True, exist_ok=True)

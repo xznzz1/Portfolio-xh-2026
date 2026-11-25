@@ -47,6 +47,8 @@ git push
 
 导出完成后会自动生成 `cloudflare-site/`。推送后，GitHub Pages 和已连接此仓库的 Cloudflare Pages 分别发布各自的目录。
 
+导出流程通过 `scripts/remove_framer_badge.py` 移除浮动的 Framer 标识及其初始化代码。此规则会在后续更新中继续应用。
+
 GitHub 上的版本是发布时的副本。Framer 编辑器中的后续修改需要重新导出和推送后才会同步。Framer 的在线编辑和统计服务属于原托管平台，导出副本不连接这些服务。
 
 ## 本地存储
