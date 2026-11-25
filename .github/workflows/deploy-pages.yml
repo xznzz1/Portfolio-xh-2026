@@ -39,6 +39,7 @@ jobs:
     if: needs.check-content.outputs.ready == 'true'
     runs-on: ubuntu-latest
     permissions:
+      actions: read
       contents: read
       pages: write
       id-token: write
@@ -55,6 +56,22 @@ jobs:
         with:
           name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
           path: site
+      - name: Wait for artifact metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_NAME: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+        shell: bash
+        run: |
+          for attempt in {1..12}; do
+            count=$(gh api --method GET "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" -f "name=${ARTIFACT_NAME}" --jq '.total_count')
+            if [ "$count" -eq 1 ]; then
+              sleep 3
+              exit 0
+            fi
+            sleep 5
+          done
+          echo '::error::The Pages artifact is not visible in the Actions API yet.'
+          exit 1
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4
