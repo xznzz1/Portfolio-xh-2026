@@ -181,6 +181,8 @@ def main():
     manifest = {"source": source, "target": target + "/", "pages": urls, "asset_count": len(assets), "downloaded_bytes": sum(len(r["data"]) for r in assets.values()), "assets": {url: asset_path(url) for url in sorted(assets)}}
     (ROOT / "docs" / "export-manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({key: manifest[key] for key in ("asset_count", "downloaded_bytes")}), flush=True)
+    from build_cloudflare import build
+    build()
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@
 
 - `src/`：源码。
 - `site/`：GitHub Pages 发布目录；实际网站入口为 `site/index.html`。
+- `cloudflare-site/`：Cloudflare Pages 发布目录，由 `scripts/build_cloudflare.py` 从 `site/` 生成，资源及站内导航使用域名根路径。
 - `assets/`：图片等项目素材。
 - `docs/`：项目文档。
 - `output/`：生成结果及交付文件。
