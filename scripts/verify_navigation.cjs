@@ -15,6 +15,21 @@ const projects = [
   ['project-title', 'LA SPORTIVA'], ['campaign-two', 'FPA'], ['forest-camp', 'SCARPA'],
 ];
 
+async function waitForImages(page) {
+  await page.evaluate(async () => {
+    await Promise.all([...document.images].filter(image => image.getClientRects().length).map(async image => {
+      image.loading = 'eager';
+      let timer;
+      try {
+        await Promise.race([
+          image.decode().catch(() => {}),
+          new Promise((_, reject) => { timer = setTimeout(() => reject(new Error(`Image load timed out: ${image.currentSrc || image.src}`)), 15000); }),
+        ]);
+      } finally { clearTimeout(timer); }
+    }));
+  });
+}
+
 (async () => {
   await fs.mkdir(tmp, { recursive: true });
   process.env.TEMP = tmp;
@@ -67,7 +82,7 @@ const projects = [
         for (let photo = 2; photo <= photoCount; photo++) {
           await page.getByRole('button', { name: 'Next image', exact: true }).click();
           await page.waitForFunction(photo => [...document.querySelectorAll('[aria-live]')].some(element => Number(element.textContent.trim().match(/^(\d+)\s*\//)?.[1]) === photo), photo);
-          await page.evaluate(async () => { await Promise.all([...document.images].filter(i => i.getClientRects().length).map(i => i.decode().catch(() => {}))); });
+          await waitForImages(page);
           assert.equal(await page.locator('img').evaluateAll(images => images.filter(i => i.getClientRects().length && !i.naturalWidth).length), 0, `Broken photo ${photo}: ${slug}`);
         }
         if (photoCount > 1) {
@@ -90,9 +105,7 @@ const projects = [
           await page.getByRole('button', { name: 'Close series', exact: true }).waitFor({ state: 'visible' });
           await page.screenshot({ path: path.join(tmp, `${label}-${mobile ? 'mobile' : 'desktop'}-gallery.png`) });
         }
-        await page.evaluate(async () => {
-          await Promise.all([...document.images].filter(i => i.getClientRects().length).map(i => i.decode().catch(() => {})));
-        });
+        await waitForImages(page);
         assert.equal(await page.locator('img').evaluateAll(images => images.filter(i => i.getClientRects().length && !i.naturalWidth).length), 0, `Broken project image: ${slug}`);
         assert.equal(await page.locator('#__framer-badge-container').count(), 0);
 
@@ -114,6 +127,7 @@ const projects = [
         assert.equal(await page.evaluate(() => window.__portfolioNavigationProbe), probe, 'Back to work reloaded the document');
         assert.equal(new URL(page.url()).hash, '#work');
         results.push({ mobile, slug, photos: photoCount, enteredMs, backMs: Math.round(performance.now() - backStart) });
+        console.log(JSON.stringify({ mobile, slug, photos: photoCount, navigation: 'passed' }));
       }
       await page.waitForTimeout(800);
       await page.screenshot({ path: path.join(tmp, `${label}-${mobile ? 'mobile' : 'desktop'}-returned.png`) });
