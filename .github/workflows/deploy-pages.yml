@@ -1,0 +1,59 @@
+name: Deploy portfolio to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  check-content:
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.content.outputs.ready }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Check portfolio content
+        id: content
+        shell: bash
+        run: |
+          if [ -s site/index.html ]; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo 'Waiting for the portfolio pages and assets. Deployment skipped.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  deploy:
+    needs: check-content
+    if: needs.check-content.outputs.ready == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4
