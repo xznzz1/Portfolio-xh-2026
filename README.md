@@ -1,12 +1,12 @@
 # Portfolio-xh-2026
 
-XH 摄影作品集，使用 GitHub Pages 部署。
+XH 摄影作品集，正式站点部署于 Cloudflare Pages，同时保留 GitHub Pages 副本。
 
 ## 网站
 
-[查看作品集](https://xznzz1.github.io/Portfolio-xh-2026/)
+[查看作品集](https://itsshaw.com/)
 
-[Cloudflare Pages 地址](https://portfolio-xh-2026.pages.dev/)
+[GitHub Pages 副本](https://xznzz1.github.io/Portfolio-xh-2026/)
 
 本仓库保存 [Framer 已发布作品集](https://successful-sandwich-977344.framer.app/) 的静态副本，包括首页、9 个作品详情页，以及页面所需的图片、字体、脚本和 CMS 索引。导航、资源路径和作品路由已适配 GitHub Pages 项目路径。
 
@@ -23,6 +23,10 @@ GitHub Pages 的项目路径为 `/Portfolio-xh-2026/`。站内链接和资源路
 部署使用 [GitHub 官方 Pages Actions](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)。
 
 ### Cloudflare Pages
+
+正式域名为 `https://itsshaw.com`，在 `scripts/build_cloudflare.py` 的 `TARGET` 中配置。生成的页面 canonical、站点地图和 robots.txt 使用该域名。
+
+`www.itsshaw.com` 在 Cloudflare 项目的 Custom domains 中单独绑定。`portfolio-xh-2026.pages.dev` 和 `www` 的跨域名跳转需使用 Cloudflare 控制台的 Redirect Rules 或 Bulk Redirects 配置；Pages 的 `_redirects` 不支持按域名匹配跳转规则。
 
 `wrangler.jsonc` 将 Cloudflare Pages 的发布目录设为 `cloudflare-site/`，其首页为 `cloudflare-site/index.html`。此目录使用域名根路径；`site/` 则使用 GitHub Pages 的项目路径。
 

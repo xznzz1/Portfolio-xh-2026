@@ -8,7 +8,7 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "site"
 OUTPUT = ROOT / "cloudflare-site"
-TARGET = "https://portfolio-xh-2026.pages.dev"
+TARGET = "https://itsshaw.com"
 TEXT_EXTENSIONS = {".html", ".mjs", ".js", ".css", ".xml", ".txt", ".json", ".svg"}
 
 
